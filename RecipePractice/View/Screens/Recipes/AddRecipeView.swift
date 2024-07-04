@@ -10,7 +10,6 @@ import SwiftUI
 struct AddRecipeView: View {
     @Environment(\.presentationMode) var presentationMode
         @StateObject var viewModel: AddRecipeViewModel 
-        @State private var isImagePickerPresented = false
     
     var body: some View {
         NavigationView {
@@ -33,7 +32,7 @@ struct AddRecipeView: View {
                                     .scaledToFit()
                                     .frame(maxWidth: .infinity, maxHeight: 300)
                             }
-                Button("Select Image", action: {isImagePickerPresented.toggle()})
+                Button("Select Image", action: {viewModel.isImagePickerPresented.toggle()})
                 Spacer()
             }
             .navigationTitle("Add Recipe")
@@ -45,7 +44,7 @@ struct AddRecipeView: View {
                 Text("Add")
             }))
         }
-        .sheet(isPresented: $isImagePickerPresented, content: {
+        .sheet(isPresented: $viewModel.isImagePickerPresented, content: {
             ImagePicker(selectedImage: $viewModel.image)
         })
     }

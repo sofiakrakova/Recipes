@@ -10,7 +10,6 @@ import RealmSwift
 
 struct RecipesView: View {
     @StateObject var viewModel = RecipesViewModel()
-    @State private var isAddRecipeViewPresented = false
     
     var body: some View {
         VStack {
@@ -38,10 +37,10 @@ struct RecipesView: View {
             }
         }
         .navigationTitle("Recipes")
-        .navigationBarItems(trailing: Button(action: { isAddRecipeViewPresented = true }, label: {
+        .navigationBarItems(trailing: Button(action: { viewModel.isAddRecipeViewPresented = true }, label: {
             Image(systemName: "plus")
         }))
-        .sheet(isPresented: $isAddRecipeViewPresented, content: {
+        .sheet(isPresented: $viewModel.isAddRecipeViewPresented, content: {
             AddRecipeView(viewModel: AddRecipeViewModel(service: viewModel.service))
                 .onDisappear(perform: {
                     viewModel.fetchRecipes()

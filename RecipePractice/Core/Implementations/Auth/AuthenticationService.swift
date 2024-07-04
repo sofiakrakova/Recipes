@@ -11,11 +11,12 @@ import FirebaseCore
 import GoogleSignIn
 import GoogleSignInSwift
 
-final class AuthenticationService: AuthenticationServiceProtocol, ObservableObject {
+final class AuthenticationService: AuthenticationServiceProtocol {
     static var shared = AuthenticationService()
-    @Published var isUserAuthenticated: Bool = false
-    
-    init() {}
+    var isAuth: Bool = false
+    var onAuthChange: ((Bool) -> Void)?
+
+    @discardableResult
     func getAuthenticatedUser() throws -> AuthDataResultModel {
         guard let user = Auth.auth().currentUser else {
             throw URLError(.badServerResponse)
@@ -23,28 +24,34 @@ final class AuthenticationService: AuthenticationServiceProtocol, ObservableObje
         return AuthDataResultModel(user: user)
     }
     
+    @discardableResult
     func createUser(email: String, password: String) async throws -> AuthDataResultModel {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
+        isAuth = true
+        onAuthChange?(isAuth)
         return AuthDataResultModel(user: authDataResult.user)
     }
     
+    @discardableResult
     func signIn(email: String, password: String) async throws -> AuthDataResultModel {
         let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
-        isUserAuthenticated = true
+        isAuth = true
+        onAuthChange?(isAuth)
         return AuthDataResultModel(user: authDataResult.user)
     }
     
     func signOut() throws {
         try Auth.auth().signOut()
-        isUserAuthenticated = false
+        isAuth = false
+        onAuthChange?(isAuth)
     }
     
+    @discardableResult
     func signInWithGoogle() async throws -> AuthDataResultModel {
         guard let rootViewController = await UIApplication.shared.firstKeyWindow?.rootViewController else {
             throw NSError(domain: "AuthenticationService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to get root view controller"])
         }
-        guard let clientID = FirebaseApp.app()?.options.clientID
-        else {
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
             throw NSError(domain: "AuthenticationService", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unable to get Firebase client ID"])
         }
         
@@ -59,10 +66,17 @@ final class AuthenticationService: AuthenticationServiceProtocol, ObservableObje
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
         
         let authResult = try await Auth.auth().signIn(with: credential)
-        isUserAuthenticated = true
+        isAuth = true
+        onAuthChange?(isAuth)
         return AuthDataResultModel(user: authResult.user)
     }
+    
+    func isUserAuthenticated() -> Bool {
+        return isAuth
+    }
 }
+
+
 extension UIApplication {
     var firstKeyWindow: UIWindow? {
         return UIApplication.shared.connectedScenes

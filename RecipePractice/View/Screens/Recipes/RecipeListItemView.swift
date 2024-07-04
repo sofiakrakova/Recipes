@@ -8,18 +8,14 @@
 import SwiftUI
 
 struct RecipeListItemView: View {
-    @State var recipe: Recipe
+    var recipe: Recipe
     
     var body: some View {
         VStack {
-            if let imagePath = recipe.image,
-                let imageUrl = URL(string: imagePath),
-                let imageData = try? Data(contentsOf: imageUrl),
-                let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
+            if let imagePath = recipe.image {
+                Image.fromPath(imagePath: imagePath)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 300)
             }
             Text(recipe.title)
                 .font(.largeTitle)

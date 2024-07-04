@@ -16,37 +16,32 @@ class RecipesViewModel: ObservableObject {
     @Published var recipes: [Recipe] = []
     @Published var searchQuery: String = ""
     @Published var sort: RecipesSort = .byName
-    
+    @Published var isAddRecipeViewPresented = false
+
     init(service: RecipesServiceProtocol = RecipesService()) {
         self.service = service
-        
+        fetchRecipes()
+    }
+    
+    func addRecipe(recipe: Recipe, image: UIImage?) {
+        service.add(recipe: recipe, image: image)
+    }
+    
+    func removeRecipe(recipe: Recipe) {
+        service.remove(recipe: recipe)
+    }
+    
+    func updateRecipe(recipe: Recipe, image: UIImage?) {
+        service.update(recipe: recipe, image: image)
+    }
+    
+    func fetchRecipes() {
         Publishers.CombineLatest($searchQuery, $sort)
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .flatMap { [weak self] searchQuery, sort -> AnyPublisher<[Recipe], Never> in
                 guard let self = self else { return Just([]).eraseToAnyPublisher() }
                 return self.service.fetch(filter: sort, searchQuery: searchQuery)
             }
-            .receive(on: RunLoop.main)
-            .assign(to: &$recipes)
-    }
-    
-    func addRecipe(recipe: Recipe, image: UIImage?) {
-        service.add(recipe: recipe, image: image)
-        fetchRecipes()
-    }
-    
-    func removeRecipe(recipe: Recipe) {
-        service.remove(recipe: recipe)
-        fetchRecipes()
-    }
-    
-    func updateRecipe(recipe: Recipe, image: UIImage?) {
-        service.update(recipe: recipe, image: image)
-        fetchRecipes()
-    }
-    
-    func fetchRecipes() {
-        service.fetch(filter: sort, searchQuery: searchQuery)
             .receive(on: RunLoop.main)
             .assign(to: &$recipes)
     }

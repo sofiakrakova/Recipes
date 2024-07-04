@@ -17,7 +17,8 @@ class AddRecipeViewModel: ObservableObject {
     @Published var calories: String = ""
     @Published var totalWeight: String = ""
     @Published var type: String = ""
-    
+    @Published var isImagePickerPresented = false
+
     init(service: RecipesServiceProtocol) {
         self.service = service
     }

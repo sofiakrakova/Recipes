@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct SignInEmailView: View {
-    
     @StateObject private var viewModel = SignInEmailViewModel()
+    
     var body: some View {
         VStack(spacing: 20) {
             FormFieldView(fieldName: "Email", fieldValue: $viewModel.emailAddress)

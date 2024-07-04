@@ -46,6 +46,8 @@ class RecipesService: RecipesServiceProtocol {
         if let image = image {
             if let imagePath = saveImage(image: image, fileName: recipe.id) {
                 recipe.image = imagePath
+                let fileExists = FileManager.default.fileExists(atPath: imagePath)
+                print("File exists at path: \(fileExists)")
             }
         }
         do {
@@ -102,7 +104,7 @@ class RecipesService: RecipesServiceProtocol {
             print("Error converting image to JPEG")
             return nil
         }
-        let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("\(fileName).jpg")
+        let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("\(fileName).jpeg", conformingTo: .jpeg)
         do {
             try data.write(to: fileURL)
             return fileURL.path

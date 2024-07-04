@@ -14,19 +14,6 @@ final class SignInEmailViewModel: ObservableObject {
     var authService: AuthenticationService = .shared
     @Published var emailAddress: String = ""
     @Published var emailPassword: String = ""
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        setup()
-    }
-    
-    private func setup() {
-        authService.$isUserAuthenticated
-            .sink { isAuthenticated in
-                print("User authentication status: \(isAuthenticated)")
-            }
-            .store(in: &cancellables)
-    }
     
     func signIn() {
         guard !emailAddress.isEmpty, !emailPassword.isEmpty else {
@@ -35,9 +22,8 @@ final class SignInEmailViewModel: ObservableObject {
         }
         Task {
             do {
-                let returnedUserData = try await authService.signIn(email: emailAddress, password: emailPassword)
+                try await authService.signIn(email: emailAddress, password: emailPassword)
                 print("Success")
-                print(returnedUserData)
             } catch {
                 print("Error: \(error)")
             }
@@ -46,9 +32,8 @@ final class SignInEmailViewModel: ObservableObject {
     func signInWithGoogle() {
         Task {
             do {
-                let returnedUserData = try await authService.signInWithGoogle()
+                try await authService.signInWithGoogle()
                 print("Success")
-                print(returnedUserData)
             } catch {
                 print("Error: \(error)")
             }

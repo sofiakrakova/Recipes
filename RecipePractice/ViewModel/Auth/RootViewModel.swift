@@ -11,26 +11,18 @@ import Combine
 @MainActor
 final class RootViewModel: ObservableObject {
     @Published var showSignInView: Bool = false
-    var authService: AuthenticationService = .shared
-    private var cancellables = Set<AnyCancellable>()
+    var authService: AuthenticationService = AuthenticationService.shared
     
     init() {
-        setup()
+        authService.onAuthChange = { isAuth in
+            self.showSignInView = !isAuth
+        }
         checkUserAuthentication()
-    }
-    
-    private func setup() {
-        authService.$isUserAuthenticated
-            .sink { [weak self] isAuthenticated in
-                print("User authentication status: \(isAuthenticated)")
-                self?.showSignInView = !isAuthenticated
-            }
-            .store(in: &cancellables)
     }
     
     func checkUserAuthentication() {
         do {
-            let _ = try authService.getAuthenticatedUser()
+            try authService.getAuthenticatedUser()
             // Если аутентификация успешна, скрываем экран входа
             showSignInView = false
         } catch {

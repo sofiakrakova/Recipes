@@ -22,13 +22,13 @@ class Recipe: Object, Identifiable {
         return "id"
     }
     
-    convenience init(title: String, ingredients: [String], calories: Double, totalWeight: Double, type: String) {
+    convenience init(title: String, ingredients: [String], calories: Double, image: String?, totalWeight: Double, type: String) {
         self.init()
         self.title = title
         self.ingredients.append(objectsIn: ingredients)
         self.calories = calories
+        self.image = image
         self.totalWeight = totalWeight
         self.type = type
     }
 }
-

@@ -9,9 +9,15 @@ import Foundation
 
 protocol AuthenticationServiceProtocol {
     static var shared: AuthenticationService { get }
+    @discardableResult
     func getAuthenticatedUser() throws -> AuthDataResultModel
+    @discardableResult
     func createUser(email: String, password: String) async throws -> AuthDataResultModel
+    @discardableResult
     func signIn(email: String, password: String) async throws -> AuthDataResultModel
+    @discardableResult
     func signInWithGoogle() async throws -> AuthDataResultModel
     func signOut() throws
+    func isUserAuthenticated() -> Bool
+    
 }
