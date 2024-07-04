@@ -8,26 +8,27 @@
 import SwiftUI
 
 struct RootView: View {
+    @StateObject private var viewModel = RootViewModel()
     
-    @State private var showSignInView: Bool = false
     var body: some View {
         ZStack {
-            NavigationStack{
+            NavigationStack {
                 ContentView()
             }
-            .onAppear{
-                let authUser = try? 
-                    AuthenticationService.shared.getAuthenticatedUser()
-                self.showSignInView = authUser == nil
+            .onAppear {
+                viewModel.checkUserAuthentication()
             }
-            .fullScreenCover(isPresented: $showSignInView) {
+            .fullScreenCover(isPresented: $viewModel.showSignInView) {
                 NavigationStack {
                     SignUpEmailView()
                 }
             }
-           // .environmentObject(AuthenticationService.shared.$isUserAuthenticated)
         }
     }
+}
+
+#Preview {
+    RootView()
 }
 
 #Preview {

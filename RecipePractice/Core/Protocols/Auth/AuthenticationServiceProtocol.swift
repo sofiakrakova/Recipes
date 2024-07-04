@@ -12,5 +12,6 @@ protocol AuthenticationServiceProtocol {
     func getAuthenticatedUser() throws -> AuthDataResultModel
     func createUser(email: String, password: String) async throws -> AuthDataResultModel
     func signIn(email: String, password: String) async throws -> AuthDataResultModel
+    func signInWithGoogle() async throws -> AuthDataResultModel
     func signOut() throws
 }

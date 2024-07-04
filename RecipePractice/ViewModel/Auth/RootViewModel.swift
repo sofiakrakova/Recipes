@@ -16,13 +16,27 @@ final class RootViewModel: ObservableObject {
     
     init() {
         setup()
+        checkUserAuthentication()
     }
     
     private func setup() {
         authService.$isUserAuthenticated
-            .sink { isAuthenticated in
+            .sink { [weak self] isAuthenticated in
                 print("User authentication status: \(isAuthenticated)")
+                self?.showSignInView = !isAuthenticated
             }
             .store(in: &cancellables)
     }
+    
+    func checkUserAuthentication() {
+        do {
+            let _ = try authService.getAuthenticatedUser()
+            // Если аутентификация успешна, скрываем экран входа
+            showSignInView = false
+        } catch {
+            // Если ошибка, показываем экран входа
+            showSignInView = true
+        }
+    }
 }
+

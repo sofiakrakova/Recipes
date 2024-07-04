@@ -26,9 +26,7 @@ struct SignInEmailView: View {
             }, label: {
                 Text("Sign In with Google")
             })
-            .disabled(viewModel.isSigningInWithGoogle)
             .buttonStyle(BlueGradientButtonStyle())
-            
         }
         .navigationTitle("Sign In")
         .padding(.vertical)

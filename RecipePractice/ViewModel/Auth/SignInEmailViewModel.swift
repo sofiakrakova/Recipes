@@ -44,14 +44,9 @@ final class SignInEmailViewModel: ObservableObject {
         }
     }
     func signInWithGoogle() {
-        isSigningInWithGoogle = true
-        guard !emailAddress.isEmpty, !emailPassword.isEmpty else {
-            print("No email address or password found.")
-            return
-        }
         Task {
             do {
-                let returnedUserData = try await authService.signIn(email: emailAddress, password: emailPassword)
+                let returnedUserData = try await authService.signInWithGoogle()
                 print("Success")
                 print(returnedUserData)
             } catch {
@@ -59,6 +54,7 @@ final class SignInEmailViewModel: ObservableObject {
             }
         }
     }
+    
     func signOut() {
         do {
             try authService.signOut()

@@ -21,7 +21,6 @@ final class SignUpEmailViewModel: ObservableObject {
     private func setup() {
         authService.$isUserAuthenticated
             .sink { isAuthenticated in
-                //???????????????????????
                 print("User authentication status: \(isAuthenticated)")
             }
             .store(in: &cancellables)
@@ -38,9 +37,8 @@ final class SignUpEmailViewModel: ObservableObject {
                 print(returnedUserData)
             } catch {
                 print("Error during sign up: \(error)")
-                DispatchQueue.main.async {
-                    print( "Failed to sign up. Please try again.")
-                }
+                print( "Failed to sign up. Please try again.")
+                
             }
         }
     }
