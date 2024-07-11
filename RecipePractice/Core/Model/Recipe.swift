@@ -31,4 +31,17 @@ class Recipe: Object, Identifiable {
         self.totalWeight = totalWeight
         self.type = type
     }
+    
+    convenience init(recipeData: RecipeDTO) {
+        self.init(title: recipeData.strMeal,
+                  ingredients: [
+                    recipeData.strIngredient1, recipeData.strIngredient2, recipeData.strIngredient3, recipeData.strIngredient4, recipeData.strIngredient5, recipeData.strIngredient6, recipeData.strIngredient7, recipeData.strIngredient8, recipeData.strIngredient9, recipeData.strIngredient10, recipeData.strIngredient11, recipeData.strIngredient12, recipeData.strIngredient13, recipeData.strIngredient14, recipeData.strIngredient15, recipeData.strIngredient16, recipeData.strIngredient17, recipeData.strIngredient18, recipeData.strIngredient19, recipeData.strIngredient20
+                  ].compactMap { $0 }.filter { !$0.isEmpty },
+                  calories: 0,
+                  image: recipeData.strMealThumb,
+                  totalWeight: 0,
+                  type: recipeData.strCategory ?? "")
+        self.id = recipeData.idMeal
+        self.dateAdded = Date()
+    }
 }

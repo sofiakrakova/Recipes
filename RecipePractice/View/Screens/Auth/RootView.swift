@@ -12,8 +12,17 @@ struct RootView: View {
     
     var body: some View {
         ZStack {
-            NavigationStack {
-                ContentView()
+            TabView {
+                NetworkRecipesView()
+                    .tabItem {
+                        Image(systemName: "globe")
+                        Text("Рецепты")
+                    }
+                RecipesView()
+                    .tabItem {
+                        Image(systemName: "fork.knife")
+                        Text("Сохранённые")
+                    }
             }
             .onAppear {
                 viewModel.checkUserAuthentication()
@@ -25,10 +34,6 @@ struct RootView: View {
             }
         }
     }
-}
-
-#Preview {
-    RootView()
 }
 
 #Preview {

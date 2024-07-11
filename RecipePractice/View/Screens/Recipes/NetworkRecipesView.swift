@@ -1,8 +1,15 @@
-import SwiftUI
-import RealmSwift
+//
+//  NetworkRecipesView.swift
+//  RecipePractice
+//
+//  Created by Sofia Krakova on 11.07.2024.
+//
 
-struct RecipesView: View {
-    @StateObject var viewModel = RecipesViewModel(service: RecipesService())
+import Foundation
+import SwiftUI
+
+struct NetworkRecipesView: View {
+    @StateObject var viewModel = RecipesViewModel(service: RecipeAPIService())
     
     var body: some View {
         NavigationView {
@@ -21,12 +28,6 @@ struct RecipesView: View {
                             .padding(.horizontal)
                             .padding(.top)
                     }
-                    .onDelete(perform: { indexSet in
-                        if let index = indexSet.first {
-                            let recipeToDelete = viewModel.recipes[index]
-                            viewModel.removeRecipe(recipe: recipeToDelete)
-                        }
-                    })
                 }
                 .background(Color(UIColor.systemGray6))
             }
@@ -41,18 +42,9 @@ struct RecipesView: View {
                         Button(action: { try? AuthenticationService.shared.signOut() }, label: {
                             Image(systemName: "rectangle.portrait.and.arrow.forward")
                         })
-                        Button(action: { viewModel.isAddRecipeViewPresented = true }, label: {
-                            Image(systemName: "plus")
-                        })
                     }
                 }
             }
-            .sheet(isPresented: $viewModel.isAddRecipeViewPresented, content: {
-                AddRecipeView(viewModel: AddRecipeViewModel(service: viewModel.service))
-                    .onDisappear(perform: {
-                        viewModel.fetchRecipes()
-                    })
-            })
             .searchable(text: $viewModel.searchQuery, placement: .navigationBarDrawer(displayMode: .always))
         }
     }

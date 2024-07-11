@@ -17,7 +17,7 @@ class RecipesViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var sort: RecipesSort = .byName
     @Published var isAddRecipeViewPresented = false
-
+    
     init(service: RecipesServiceProtocol = RecipesService()) {
         self.service = service
         fetchRecipes()
@@ -25,14 +25,18 @@ class RecipesViewModel: ObservableObject {
     
     func addRecipe(recipe: Recipe, image: UIImage?) {
         service.add(recipe: recipe, image: image)
+        fetchRecipes()
     }
     
     func removeRecipe(recipe: Recipe) {
-        service.remove(recipe: recipe)
+        service.remove(recipe: recipe) { [weak self] in
+            self?.fetchRecipes()
+        }
     }
     
     func updateRecipe(recipe: Recipe, image: UIImage?) {
         service.update(recipe: recipe, image: image)
+        fetchRecipes()
     }
     
     func fetchRecipes() {

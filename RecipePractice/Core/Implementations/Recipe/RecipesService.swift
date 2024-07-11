@@ -11,91 +11,95 @@ import Combine
 import UIKit
 
 class RecipesService: RecipesServiceProtocol {
-    private var realm: Realm
-    
-    init() {
-        do {
-            realm = try Realm()
-        } catch let error as NSError {
-            fatalError("Failed to initialize Realm: \(error.localizedDescription)")
-        }
-    }
-    
     func fetch(filter: RecipesSort, searchQuery: String? = nil) -> AnyPublisher<[Recipe], Never> {
-        var recipes = realm.objects(Recipe.self)
-        
-        // Фильтрация по запросу
-        if let searchQuery = searchQuery, !searchQuery.isEmpty {
-            recipes = recipes.filter("title CONTAINS[c] %@", searchQuery)
-        }
-        
-        // Сортировка по заданному фильтру
-        switch filter {
-        case .byName:
-            recipes = recipes.sorted(byKeyPath: "title", ascending: true)
-        case .byDateAdded:
-            recipes = recipes.sorted(byKeyPath: "dateAdded", ascending: true)
-        case .byType:
-            recipes = recipes.sorted(byKeyPath: "type", ascending: true)
-        }
-        
-        return recipes.publisher.collect().eraseToAnyPublisher()
+        return Future { promise in
+            DispatchQueue.main.async {
+                do {
+                    let realm = try Realm()
+                    var recipes = realm.objects(Recipe.self)
+                    
+                    // Фильтрация по запросу
+                    if let searchQuery = searchQuery, !searchQuery.isEmpty {
+                        recipes = recipes.filter("title CONTAINS[c] %@", searchQuery)
+                    }
+                    
+                    // Сортировка по заданному фильтру
+                    switch filter {
+                    case .byName:
+                        recipes = recipes.sorted(byKeyPath: "title", ascending: true)
+                    case .byDateAdded:
+                        recipes = recipes.sorted(byKeyPath: "dateAdded", ascending: true)
+                    case .byType:
+                        recipes = recipes.sorted(byKeyPath: "type", ascending: true)
+                    }
+                    
+                    promise(.success(Array(recipes)))
+                } catch {
+                    print("Failed to fetch recipes: \(error.localizedDescription)")
+                    promise(.success([]))
+                }
+            }
+        }.eraseToAnyPublisher()
     }
     
     func add(recipe: Recipe, image: UIImage?) {
-        if let image = image {
-            if let imagePath = saveImage(image: image, fileName: recipe.id) {
-                recipe.image = imagePath
-                let fileExists = FileManager.default.fileExists(atPath: imagePath)
-                print("File exists at path: \(fileExists)")
+        DispatchQueue.main.async {
+            do {
+                let realm = try Realm()
+                try realm.write {
+                    if let image = image, let imagePath = self.saveImage(image: image, fileName: recipe.id) {
+                        recipe.image = imagePath
+                    }
+                    realm.add(recipe)
+                }
+            } catch let error as NSError {
+                print("Failed to add recipe: \(error.localizedDescription)")
             }
-        }
-        do {
-            try realm.write {
-                realm.add(recipe)
-            }
-        } catch let error as NSError {
-            print("Failed to add recipe: \(error.localizedDescription)")
         }
     }
     
-    func remove(recipe: Recipe) {
-        if let imagePath = recipe.image {
-            deleteImageFromDocuments(imagePath: imagePath)
-        }
-        do {
-            try realm.write {
-                if let existingRecipe = realm.object(ofType: Recipe.self, forPrimaryKey: recipe.id) {
-                    realm.delete(existingRecipe)
-                } else {
-                    print("Recipe not found in database.")
+    func remove(recipe: Recipe, completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            do {
+                let realm = try Realm()
+                if let imagePath = recipe.image {
+                    self.deleteImageFromDocuments(imagePath: imagePath)
                 }
+                try realm.write {
+                    if let existingRecipe = realm.object(ofType: Recipe.self, forPrimaryKey: recipe.id) {
+                        realm.delete(existingRecipe)
+                    } else {
+                        print("Recipe not found in database.")
+                    }
+                }
+                completion()
+            } catch let error as NSError {
+                print("Failed to remove recipe: \(error.localizedDescription)")
+                completion()
             }
-        } catch let error as NSError {
-            print("Failed to remove recipe: \(error.localizedDescription)")
         }
     }
     
     func update(recipe: Recipe, image: UIImage?) {
-        if let image = image {
-            // Удаление старого изображения, если оно существует
-            if let oldImagePath = recipe.image {
-                deleteImageFromDocuments(imagePath: oldImagePath)
-            }
-            if let imagePath = saveImage(image: image, fileName: recipe.id) {
-                recipe.image = imagePath
-            }
-        }
-        do {
-            try realm.write {
-                if realm.object(ofType: Recipe.self, forPrimaryKey: recipe.id) != nil {
-                    realm.add(recipe, update: .modified)
-                } else {
-                    print("Recipe not found in database.")
+        DispatchQueue.main.async {
+            do {
+                let realm = try Realm()
+                try realm.write {
+                    if let image = image, let oldImagePath = recipe.image {
+                        self.deleteImageFromDocuments(imagePath: oldImagePath)
+                        if let imagePath = self.saveImage(image: image, fileName: recipe.id) {
+                            recipe.image = imagePath
+                        }
+                    }
+                    if realm.object(ofType: Recipe.self, forPrimaryKey: recipe.id) != nil {
+                        realm.add(recipe, update: .modified)
+                    } else {
+                        print("Recipe not found in database.")
+                    }
                 }
+            } catch let error as NSError {
+                print("Failed to update recipe: \(error.localizedDescription)")
             }
-        } catch let error as NSError {
-            print("Failed to update recipe: \(error.localizedDescription)")
         }
     }
 

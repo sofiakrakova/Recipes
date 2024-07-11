@@ -46,6 +46,7 @@ struct AddRecipeView: View {
         }
         .sheet(isPresented: $viewModel.isImagePickerPresented, content: {
             ImagePicker(selectedImage: $viewModel.image)
+                .edgesIgnoringSafeArea(.bottom)
         })
     }
     
