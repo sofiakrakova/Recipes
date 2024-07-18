@@ -8,7 +8,6 @@
 import Foundation
 
 protocol AuthenticationServiceProtocol {
-    static var shared: AuthenticationService { get }
     @discardableResult
     func getAuthenticatedUser() throws -> AuthDataResultModel
     @discardableResult
@@ -20,4 +19,5 @@ protocol AuthenticationServiceProtocol {
     func signOut() throws
     func isUserAuthenticated() -> Bool
     
+    var onAuthChange: ((Bool) -> Void)? { get set }
 }

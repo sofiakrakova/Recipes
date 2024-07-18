@@ -10,21 +10,27 @@ import Moya
 import UIKit
 import Combine
 
-class RecipeAPIService: RecipesServiceProtocol {
+class RecipeAPIService: APIRecipesServiceProtocol {
     private let provider = MoyaProvider<RecipeAPI>()
-
-    func fetch(filter: RecipesSort, searchQuery: String?) -> AnyPublisher<[Recipe], Never> {
+    
+    func fetch(filter: RecipesSort, searchQuery: String?, searchType: SearchType) -> AnyPublisher<[Recipe], Never> {
         Future<[Recipe], Never> { promise in
             self.provider.request(.getRecipes) { result in
                 switch result {
                 case .success(let response):
                     do {
-                        
                         let recipesData = try JSONDecoder().decode(MealResponse.self, from: response.data)
                         var recipes = recipesData.meals.map { Recipe(recipeData: $0) }
-                            
+                        
                         if let searchQuery = searchQuery, !searchQuery.isEmpty {
-                            recipes = recipes.filter { $0.title.contains(searchQuery) }
+                            switch searchType {
+                            case .byName:
+                                recipes = recipes.filter { $0.title.contains(searchQuery) }
+                            case .byIngredients:
+                                recipes = recipes.filter { recipe in
+                                    recipe.ingredients.contains { $0.contains(searchQuery) }
+                                }
+                            }
                         }
                         
                         switch filter {
@@ -48,17 +54,5 @@ class RecipeAPIService: RecipesServiceProtocol {
             }
         }
         .eraseToAnyPublisher()
-    }
-    
-    func add(recipe: Recipe, image: UIImage?) {
-         
-    }
-    
-    func remove(recipe: Recipe, completion: @escaping () -> Void) {
-         
-    }
-    
-    func update(recipe: Recipe, image: UIImage?) {
-         
     }
 }

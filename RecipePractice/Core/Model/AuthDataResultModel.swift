@@ -1,6 +1,6 @@
 //
 //  AuthDataResultModel.swift
-//  Recipe
+//  RecipePractice
 //
 //  Created by Sofia Krakova on 26.06.2024.
 //

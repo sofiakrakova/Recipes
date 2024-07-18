@@ -7,13 +7,16 @@
 import SwiftUI
 import Combine
 
-@MainActor
 final class SignInEmailViewModel: ObservableObject {
     
     @Published var isSigningInWithGoogle: Bool = false
-    var authService: AuthenticationService = .shared
+    private let authService: AuthenticationServiceProtocol
     @Published var emailAddress: String = ""
     @Published var emailPassword: String = ""
+    
+    init(authService: AuthenticationServiceProtocol) {
+        self.authService = authService
+    }
     
     func signIn() {
         guard !emailAddress.isEmpty, !emailPassword.isEmpty else {

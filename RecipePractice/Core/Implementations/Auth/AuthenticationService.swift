@@ -12,7 +12,6 @@ import GoogleSignIn
 import GoogleSignInSwift
 
 final class AuthenticationService: AuthenticationServiceProtocol {
-    static var shared = AuthenticationService()
     var isAuth: Bool = false
     var onAuthChange: ((Bool) -> Void)?
 

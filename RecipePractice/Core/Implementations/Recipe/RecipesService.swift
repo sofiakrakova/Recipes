@@ -11,7 +11,7 @@ import Combine
 import UIKit
 
 class RecipesService: RecipesServiceProtocol {
-    func fetch(filter: RecipesSort, searchQuery: String? = nil) -> AnyPublisher<[Recipe], Never> {
+    func fetch(filter: RecipesSort, searchQuery: String? = nil, searchType: SearchType = .byName) -> AnyPublisher<[Recipe], Never> {
         return Future { promise in
             DispatchQueue.main.async {
                 do {
@@ -20,7 +20,12 @@ class RecipesService: RecipesServiceProtocol {
                     
                     // Фильтрация по запросу
                     if let searchQuery = searchQuery, !searchQuery.isEmpty {
-                        recipes = recipes.filter("title CONTAINS[c] %@", searchQuery)
+                        switch searchType {
+                        case .byName:
+                            recipes = recipes.filter("title CONTAINS[c] %@", searchQuery)
+                        case .byIngredients:
+                            recipes = recipes.filter("ANY ingredients CONTAINS[c] %@", searchQuery)
+                        }
                     }
                     
                     // Сортировка по заданному фильтру
@@ -102,7 +107,7 @@ class RecipesService: RecipesServiceProtocol {
             }
         }
     }
-
+    
     private func saveImage(image: UIImage, fileName: String) -> String? {
         guard let data = image.jpegData(compressionQuality: 0.8) else {
             print("Error converting image to JPEG")

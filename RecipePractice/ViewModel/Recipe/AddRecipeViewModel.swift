@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 class AddRecipeViewModel: ObservableObject {
-    let service: RecipesServiceProtocol
+    let interactor: RecipesInteractorProtocol
     
     @Published var title: String = ""
     @Published var ingredients: String = ""
@@ -19,18 +19,18 @@ class AddRecipeViewModel: ObservableObject {
     @Published var type: String = ""
     @Published var isImagePickerPresented = false
 
-    init(service: RecipesServiceProtocol) {
-        self.service = service
+    init(interactor: RecipesInteractorProtocol) {
+        self.interactor = interactor
     }
     
     func addRecipe() {
         let newRecipe = Recipe()
         newRecipe.title = title
         newRecipe.ingredients.append(objectsIn: ingredients.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
-        newRecipe.calories = Double(calories) ?? 0.0
-        newRecipe.totalWeight = Double(totalWeight) ?? 0.0
+        newRecipe.calories = Int(calories) ?? 0
+        newRecipe.totalWeight = Int(totalWeight) ?? 0
         newRecipe.type = type
         
-        service.add(recipe: newRecipe, image: image)
+        interactor.add(recipe: newRecipe, image: image)
     }
 }

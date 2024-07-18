@@ -7,13 +7,16 @@
 
 import SwiftUI
 
-@MainActor
 final class SignUpEmailViewModel: ObservableObject {
     
-    let authService: AuthenticationServiceProtocol = AuthenticationService.shared
+    private let authService: AuthenticationServiceProtocol
     @Published var emailAddress: String = ""
     @Published var password: String = ""
     
+    init(authService: AuthenticationServiceProtocol) {
+        self.authService = authService
+    }
+
     func signUp() {
         guard !emailAddress.isEmpty,!password.isEmpty else {
             print("No email address or password found.")

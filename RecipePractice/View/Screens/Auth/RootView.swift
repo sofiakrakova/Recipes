@@ -6,36 +6,34 @@
 //
 
 import SwiftUI
+import Swinject
 
 struct RootView: View {
-    @StateObject private var viewModel = RootViewModel()
+    @Environment(\.container) var container: Container
+    @StateObject var viewModel: RootViewModel
     
     var body: some View {
         ZStack {
             TabView {
-                NetworkRecipesView()
-                    .tabItem {
-                        Image(systemName: "globe")
-                        Text("Рецепты")
-                    }
-                RecipesView()
-                    .tabItem {
-                        Image(systemName: "fork.knife")
-                        Text("Сохранённые")
-                    }
+                RecipesView(viewModel: self.container.resolve(RecipesViewModel.self, name: "APIViewModel")!)
+                .tabItem {
+                    Image(systemName: "globe")
+                    Text(StringCatalog.recipies)
+                }
+                RecipesView(viewModel: self.container.resolve(RecipesViewModel.self, name: "LocalViewModel")!)
+                .tabItem {
+                    Image(systemName: "fork.knife")
+                    Text(StringCatalog.saved)
+                }
             }
             .onAppear {
                 viewModel.checkUserAuthentication()
             }
             .fullScreenCover(isPresented: $viewModel.showSignInView) {
                 NavigationStack {
-                    SignUpEmailView()
+                    SignUpEmailView(viewModel: container.resolve(SignUpEmailViewModel.self)!)
                 }
             }
         }
     }
-}
-
-#Preview {
-    RootView()
 }

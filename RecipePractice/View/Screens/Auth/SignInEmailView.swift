@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignInEmailView: View {
-    @StateObject private var viewModel = SignInEmailViewModel()
+    @StateObject var viewModel: SignInEmailViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -30,11 +30,5 @@ struct SignInEmailView: View {
         }
         .navigationTitle("Sign In")
         .padding(.vertical)
-    }
-}
-
-#Preview {
-    NavigationStack {
-        SignInEmailView()
     }
 }

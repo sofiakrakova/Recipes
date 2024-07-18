@@ -1,0 +1,66 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "- %@" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add Recipe" : {
+
+    },
+    "Already have an account?" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Create an account" : {
+
+    },
+    "Edit" : {
+
+    },
+    "ingredients" : {
+      "extractionState" : "manual"
+    },
+    "Recipe Detail" : {
+
+    },
+    "Recipes" : {
+
+    },
+    "Save" : {
+
+    },
+    "Search by" : {
+
+    },
+    "Select Image" : {
+
+    },
+    "Sign in" : {
+
+    },
+    "Sign In" : {
+
+    },
+    "Sign In with Email" : {
+
+    },
+    "Sign In with Google" : {
+
+    },
+    "Sign Up" : {
+
+    },
+    "Sort by" : {
+
+    },
+    "title" : {
+      "extractionState" : "manual"
+    }
+  },
+  "version" : "1.0"
+}

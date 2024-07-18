@@ -4,27 +4,35 @@
 //
 //  Created by Sofia Krakova on 01.07.2024.
 
-
 import SwiftUI
+import Combine
+import Swinject
 
 struct RecipeListItemView: View {
+    @Environment(\.container) var container: Container
     var recipe: Recipe
+    var isLocal: Bool
+    private var cancellables = Set<AnyCancellable>()
     
+    internal init(recipe: Recipe, isLocal: Bool) {
+        self.recipe = recipe
+        self.isLocal = isLocal
+    }
+
     var body: some View {
-        NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+        NavigationLink(destination: RecipeDetailView(viewModel: container.resolve(RecipeDetailViewModel.self)!, recipe: recipe, isLocal: isLocal)) {
             VStack {
-                if let imagePath = recipe.image {
-                    Image.fromPath(imagePath: imagePath)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(5)
-                }
+                RecipeImageView(imagePath: recipe.image)
                 Text(recipe.title)
                     .font(.largeTitle)
-                Text("Calories: \(recipe.calories, specifier: "%.1f")")
-                Text("Total Weight: \(recipe.totalWeight, specifier: "%.1f")")
+                if recipe.calories > 0 {
+                    Text(String(format: NSLocalizedString(StringCatalog.caloriesFormat, comment: ""), "\(recipe.calories)"))
+                }
+                if recipe.totalWeight > 0 {
+                    Text(String(format: NSLocalizedString(StringCatalog.totalWeightFormat, comment: ""), "\(recipe.totalWeight)"))
+                }
                 VStack(alignment: .leading) {
-                    Text("Ingredients:")
+                    Text(StringCatalog.ingredients)
                         .font(.headline)
                         .padding(.bottom, 5)
                     ForEach(recipe.ingredients, id: \.self) { ingredient in

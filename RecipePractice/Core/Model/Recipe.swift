@@ -11,10 +11,10 @@ import RealmSwift
 class Recipe: Object, Identifiable {
     @objc dynamic var id: String = UUID().uuidString
     @objc dynamic var title: String = ""
-    let ingredients = List<String>()
+    var ingredients = List<String>()
     @objc dynamic var image: String? = nil
-    @objc dynamic var calories: Double = 0.0
-    @objc dynamic var totalWeight: Double = 0.0
+    @objc dynamic var calories: Int = 0
+    @objc dynamic var totalWeight: Int = 0
     @objc dynamic var dateAdded: Date = Date()
     @objc dynamic var type: String = ""
     
@@ -22,7 +22,7 @@ class Recipe: Object, Identifiable {
         return "id"
     }
     
-    convenience init(title: String, ingredients: [String], calories: Double, image: String?, totalWeight: Double, type: String) {
+    convenience init(title: String, ingredients: [String], calories: Int, image: String?, totalWeight: Int, type: String) {
         self.init()
         self.title = title
         self.ingredients.append(objectsIn: ingredients)
@@ -32,7 +32,7 @@ class Recipe: Object, Identifiable {
         self.type = type
     }
     
-    convenience init(recipeData: RecipeDTO) {
+    convenience init(recipeData: RecipeResponse) {
         self.init(title: recipeData.strMeal,
                   ingredients: [
                     recipeData.strIngredient1, recipeData.strIngredient2, recipeData.strIngredient3, recipeData.strIngredient4, recipeData.strIngredient5, recipeData.strIngredient6, recipeData.strIngredient7, recipeData.strIngredient8, recipeData.strIngredient9, recipeData.strIngredient10, recipeData.strIngredient11, recipeData.strIngredient12, recipeData.strIngredient13, recipeData.strIngredient14, recipeData.strIngredient15, recipeData.strIngredient16, recipeData.strIngredient17, recipeData.strIngredient18, recipeData.strIngredient19, recipeData.strIngredient20

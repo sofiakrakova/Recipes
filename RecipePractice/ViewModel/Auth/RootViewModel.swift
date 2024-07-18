@@ -8,12 +8,12 @@
 import SwiftUI
 import Combine
 
-@MainActor
 final class RootViewModel: ObservableObject {
     @Published var showSignInView: Bool = false
-    var authService: AuthenticationService = AuthenticationService.shared
+    var authService: AuthenticationServiceProtocol
     
-    init() {
+    init(service: AuthenticationServiceProtocol) {
+        authService = service
         authService.onAuthChange = { isAuth in
             self.showSignInView = !isAuth
         }

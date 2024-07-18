@@ -10,43 +10,53 @@ import RealmSwift
 import UIKit
 
 class RecipesViewModel: ObservableObject {
-    let service: RecipesServiceProtocol
-    private var cancellables = Set<AnyCancellable>()
-    
     @Published var recipes: [Recipe] = []
     @Published var searchQuery: String = ""
     @Published var sort: RecipesSort = .byName
+    @Published var searchType: SearchType = .byName
     @Published var isAddRecipeViewPresented = false
     
-    init(service: RecipesServiceProtocol = RecipesService()) {
-        self.service = service
-        fetchRecipes()
+    private let interactor: RecipesInteractorProtocol
+    private let authService: AuthenticationServiceProtocol
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(interactor: RecipesInteractorProtocol, authService: AuthenticationServiceProtocol) {
+        self.interactor = interactor
+        self.authService = authService
     }
     
     func addRecipe(recipe: Recipe, image: UIImage?) {
-        service.add(recipe: recipe, image: image)
+        interactor.add(recipe: recipe, image: image)
         fetchRecipes()
     }
     
     func removeRecipe(recipe: Recipe) {
-        service.remove(recipe: recipe) { [weak self] in
+        interactor.remove(recipe: recipe) { [weak self] in
             self?.fetchRecipes()
         }
     }
     
     func updateRecipe(recipe: Recipe, image: UIImage?) {
-        service.update(recipe: recipe, image: image)
+        interactor.update(recipe: recipe, image: image)
         fetchRecipes()
     }
     
     func fetchRecipes() {
-        Publishers.CombineLatest($searchQuery, $sort)
+        Publishers.CombineLatest3($searchQuery, $sort, $searchType)
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .flatMap { [weak self] searchQuery, sort -> AnyPublisher<[Recipe], Never> in
+            .flatMap { [weak self] searchQuery, sort, searchType -> AnyPublisher<[Recipe], Never> in
                 guard let self = self else { return Just([]).eraseToAnyPublisher() }
-                return self.service.fetch(filter: sort, searchQuery: searchQuery)
+                return self.interactor.fetch(filter: sort, searchQuery: searchQuery.isEmpty ? nil : searchQuery, searchType: searchType)
             }
             .receive(on: RunLoop.main)
             .assign(to: &$recipes)
+    }
+    
+    func signOut() {
+        try? authService.signOut()
+    }
+    
+    var isLocal: Bool {
+        interactor is LocalRecipesInteractor
     }
 }

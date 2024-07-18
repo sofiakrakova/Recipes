@@ -1,73 +1,72 @@
 import SwiftUI
+import Swinject
 
 struct RecipeDetailView: View {
-    var recipe: Recipe
+    @Environment(\.container) var container: Container
+    @StateObject var viewModel: RecipeDetailViewModel
+    
+    init(viewModel: RecipeDetailViewModel, recipe: Recipe, isLocal: Bool) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.viewModel.recipe = recipe
+        self.viewModel.isLocal = isLocal
+    }
     
     var body: some View {
-        ScrollView {
-            VStack {
-                if let imagePath = recipe.image {
-                    Image.fromPath(imagePath: imagePath)
-                        .resizable()
-                        .scaledToFill()
-                        .cornerRadius(5)
-                }
-                
-                Text(recipe.title)
-                    .font(.largeTitle)
-                    .padding()
-                
+        NavigationView {
+            ScrollView {
                 VStack {
-                    HStack {
-                        Text("Calories:")
-                            .bold()
-                        Spacer()
-                        Text("\(recipe.calories, specifier: "%.1f")")
-                    }
-                    .padding(.vertical, 5)
-                    
-                    HStack {
-                        Text("Total Weight:")
-                            .bold()
-                        Spacer()
-                        Text("\(recipe.totalWeight, specifier: "%.1f")")
-                    }
-                    .padding(.vertical, 5)
-                    
-                    HStack {
-                        Text("Type:")
-                            .bold()
-                        Spacer()
-                        Text(recipe.type)
-                    }
-                    .padding(.vertical, 5)
-                }
-                .padding()
-                .background(Color(UIColor.systemGray6))
-                .cornerRadius(10)
-                
-                if recipe.ingredients.count > 0 {
-                    Text("Ingredients:")
-                        .font(.headline)
-                        .padding(.top)
-                    VStack(alignment: .leading) {
-                        ForEach(recipe.ingredients, id: \.self) { ingredient in
-                            HStack {
-                                Text("- \(ingredient)")
-                                    .padding(.vertical, 4)
-                                Spacer()
+                    if let recipe = viewModel.recipe {
+                        RecipeImageView(imagePath: recipe.image)
+                        Text(recipe.title)
+                            .font(.largeTitle)
+                            .padding()
+                        
+                        if viewModel.hasInfo() {
+                            RecipeInfoView(recipe: recipe)
+                        }
+                        
+                        if recipe.ingredients.count > 0 {
+                            IngredientsView(ingredients: Array(recipe.ingredients))
+                        }
+                        if !viewModel.isLocal {
+                            Button(action: { viewModel.save() }, label: {
+                                Text("Save")
+                            })
+                        } else {
+                            NavigationLink(destination: EditRecipeView(viewModel: container.resolve(EditRecipeViewModel.self)!, recipe: recipe)) {
+                                Text("Edit")
                             }
                         }
                     }
-                    .padding()
-                    .background(Color(UIColor.systemGray6))
-                    .cornerRadius(10)
+                    
                 }
-                Text("Date Added: \(recipe.dateAdded, formatter: DateFormatter.shortDateFormatter)")
-                    .foregroundStyle(.secondary)
-                    .padding(.top)
+                .padding()
             }
-            .padding()
+            .navigationTitle("Recipe Detail")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        viewModel.isShareSheetShowing = true
+                    }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.title3)
+                    }
+                }
+            }
+            .sheet(isPresented: $viewModel.isShareSheetShowing, content: {
+                ActivityViewController(activityItems: [viewModel.shareContent()])
+            })
         }
     }
+}
+
+struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

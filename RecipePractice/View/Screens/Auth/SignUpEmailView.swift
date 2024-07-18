@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignUpEmailView: View {
-    @ObservedObject private var viewModel = SignUpEmailViewModel()
+    @ObservedObject var viewModel: SignUpEmailViewModel
     
     var body: some View {
         VStack {
@@ -40,7 +40,4 @@ struct SignUpEmailView: View {
             }
         }
     }
-}
-#Preview {
-    SignUpEmailView()
 }

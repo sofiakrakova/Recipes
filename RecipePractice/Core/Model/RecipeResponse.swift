@@ -7,15 +7,11 @@
 
 import Foundation
 
-struct RecipeDTO: Codable {
+struct RecipeResponse: Codable {
     let idMeal: String
     let strMeal: String
     let strCategory: String?
-    let strArea: String?
-    let strInstructions: String?
     let strMealThumb: String?
-    let strTags: String?
-    let strYoutube: String?
     let strIngredient1: String?
     let strIngredient2: String?
     let strIngredient3: String?
@@ -36,40 +32,12 @@ struct RecipeDTO: Codable {
     let strIngredient18: String?
     let strIngredient19: String?
     let strIngredient20: String?
-    let strMeasure1: String?
-    let strMeasure2: String?
-    let strMeasure3: String?
-    let strMeasure4: String?
-    let strMeasure5: String?
-    let strMeasure6: String?
-    let strMeasure7: String?
-    let strMeasure8: String?
-    let strMeasure9: String?
-    let strMeasure10: String?
-    let strMeasure11: String?
-    let strMeasure12: String?
-    let strMeasure13: String?
-    let strMeasure14: String?
-    let strMeasure15: String?
-    let strMeasure16: String?
-    let strMeasure17: String?
-    let strMeasure18: String?
-    let strMeasure19: String?
-    let strMeasure20: String?
-    let strSource: String?
-    let strImageSource: String?
-    let strCreativeCommonsConfirmed: String?
-    let dateModified: String?
     
     enum CodingKeys: String, CodingKey {
         case idMeal
         case strMeal
         case strCategory
-        case strArea
-        case strInstructions
         case strMealThumb
-        case strTags
-        case strYoutube
         case strIngredient1
         case strIngredient2
         case strIngredient3
@@ -90,33 +58,9 @@ struct RecipeDTO: Codable {
         case strIngredient18
         case strIngredient19
         case strIngredient20
-        case strMeasure1
-        case strMeasure2
-        case strMeasure3
-        case strMeasure4
-        case strMeasure5
-        case strMeasure6
-        case strMeasure7
-        case strMeasure8
-        case strMeasure9
-        case strMeasure10
-        case strMeasure11
-        case strMeasure12
-        case strMeasure13
-        case strMeasure14
-        case strMeasure15
-        case strMeasure16
-        case strMeasure17
-        case strMeasure18
-        case strMeasure19
-        case strMeasure20
-        case strSource
-        case strImageSource
-        case strCreativeCommonsConfirmed
-        case dateModified
     }
 }
 
 struct MealResponse: Codable {
-    let meals: [RecipeDTO]
+    let meals: [RecipeResponse]
 }
